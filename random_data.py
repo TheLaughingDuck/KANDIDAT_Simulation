@@ -1,5 +1,5 @@
-import pandas as pd
 import random
+import numpy as np
 
 
 
@@ -9,34 +9,38 @@ import random
 
 
 
+def make_clusters(N, d=2, K=4):
+    
+    # Create a numpy array
+
+    # Generate TRUE centers
+    true_centers = np.array([[random.randint(0,1000) for i in range(d)] for i in range(K)])
+
+    one_point = random.choices(true_centers)[0]
+    randomness = [random.gauss(0, 20) for i in range(d)] #array of gaussians
+    data = np.array([one_point + randomness])
+
+    #print("PRINTING FIRST data: ", data)
+
+    while len(data) < N:
+        #print("-----------------")
+        #print("New While Loop Lap: ", len(data))
+
+        one_point = random.choices(true_centers)[0]
+        randomness = [random.gauss(0, 20) for i in range(d)] #array
+        one_point = one_point + randomness
+
+        #print("PRINTING data: ", data)
+        #print("PRINTING one_point: ", one_point)
+        data = np.append(data, [one_point], axis=0)
+
+    
+    return data
+
+#print("FINAL RESULT data: ", make_clusters_array(100, 2, 3))
 
 # A function for generating custom random blobs/clusters
 # The idea is to use this only in the beginning to create some desired
 # datasets, store them, and then read from the files. This function
 # is only intended to be used before the analysis part of the study takes
 # place.
-def make_clusters(N, d, K):
-    #Create empty dataframe
-    data_points = pd.DataFrame([], columns=[i for i in range(0,d)])
-
-    for i in range(0,K):
-        true_center = [random.uniform(0,100) for i in range(0,d)] #Random true center.
-        for j in range(0, N):
-            one_point = [random.gauss(true_center[i], 1) for i in range(0,d)] #Generate the random point around the center.
-            
-            #Make it a dataframe
-            one_point = pd.DataFrame([one_point], columns=[i for i in range(0,d)])
-
-            #print("---------------")
-
-            #print("Dataframe of points. ", f"i = {i}, ", f"j = {j}.")
-            #print(points)
-
-            #print("Dataframe of one point. ", f"i = {i}, ", f"j = {j}.")
-            #print(one_point)
-
-            #Add point to dataframe of points
-            data_points = pd.concat([data_points, one_point], keys=list(data_points.columns), ignore_index=True)
-    
-    # Return the finished data.
-    return data_points

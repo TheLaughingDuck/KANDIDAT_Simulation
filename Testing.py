@@ -4,24 +4,27 @@ import pandas as pd
 
 import random
 
+import random_data
+import seeds
+dframe=random_data.make_clusters(50, 2, 5)
+print(seeds.plusplus_array(dframe, 5))
+
+#def plot_graph(data, points):
+#    pass
 
 
-def plot_graph(data, points):
-    pass
-
-
-df1 = pd.DataFrame(
-    {
-        "X":[1,1.3,0.9, 3, 3.5, 3.3],
-        "Y":[2,2.2,2.1, 4.1, 4.2, 4]
-    }
-)
+#df1 = pd.DataFrame(
+#    {
+#        "X":[1,1.3,0.9, 3, 3.5, 3.3],
+#        "Y":[2,2.2,2.1, 4.1, 4.2, 4]
+#    }
+#)
 
 
 # Set parameters
-N = 10
-d = 2 #Dimensions or Features
-K = 2
+#N = 10
+#d = 2 #Dimensions or Features
+#K = 2
 
 
 # Create or Load Data
@@ -29,9 +32,9 @@ K = 2
 #points = pd.DataFrame([], columns=[i for i in range(0,d)])
 
 # Large "blank dataframe" N rows, d+1 columns.
-dframe = pd.DataFrame([[0 for i in range(d)]+[1] for j in range(N)] , columns=[k for k in range(0,d+1)]) 
+#dframe = pd.DataFrame([[0 for i in range(d)]+[1] for j in range(N)] , columns=[k for k in range(0,d+1)]) 
 
-print(dframe)
+#print(dframe)
 
 #plt.scatter(df1["X"], df1["Y"])
 #plt.show()'
