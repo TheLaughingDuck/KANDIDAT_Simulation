@@ -64,5 +64,25 @@ def kmeans_func(data, seed_method, K, nstarts=1):
     best_centers = finished_centers[loss_list.index(min(loss_list))]
 
     ### Possibly make a plot?
+    if len(data[0]) == 2 and nstarts == 1:
+        make_plot(data, seed, best_centers)
     
     return best_centers
+
+import matplotlib.pyplot as plt
+
+def make_plot(data, seed, centers):
+    #Plot data
+    plt.scatter(data[:,0], data[:,1], marker=".")
+    
+    #Plot seed
+    plt.scatter(seed[:,0], seed[:,1], color="red", marker=".")
+
+    #Plot final centers
+    plt.scatter(centers[:,0], centers[:,1], color="orange", marker="*")
+
+    #Label fix
+    plt.figtext(x=0.5, y=0.01, s="Text here", wrap=True)
+
+    # Show plot
+    plt.show()

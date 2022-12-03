@@ -11,7 +11,6 @@ def random_seed(df, K):
 
 
 def plusplus(data, K):
-
     ### Select first center uniformly random
     index = random.randint(0, len(data)-1)
     seed = np.array([data[index]])
@@ -68,4 +67,74 @@ def plusplus(data, K):
 
 
 def kaufman(data, K):
-    return None
+    ### Calculate and select most central instance
+    ## Calculate global average
+    global_average = sum(data) / len(data) #I love numpy
+
+    ## Select most central instance
+    minimal_distance = None
+    index = 0
+    for i in range(len(data)):
+        distance = math.dist(data[i], global_average)
+
+        if minimal_distance is None:
+            minimal_distance = distance
+            index = i
+        elif distance < minimal_distance:
+            minimal_distance = distance
+            index = i
+    
+    ## Relocate central point
+    seed = np.array([data[index]])
+    data = np.delete(data, obj=index, axis=0)
+    
+    # I fully trust everything up till this point.
+
+    ### Do some form of cycle until seed is appropriate length
+    while len(seed) < K:
+        ## Calculate all different SUM C_{ji}
+        C_sum = 0
+        sum_list = []
+
+        for i in range(len(data)):
+            for j in range(len(data)):
+                ## Calculate point j's closest distance to a center; D_j
+                minimal_distance = None
+                for c in range(len(seed)):
+                    D_j = math.dist(data[j], seed[c])
+                    if minimal_distance is None or D_j < minimal_distance:
+                        minimal_distance = D_j
+                ## Calculate the sum of C_ji for the current i.
+                C_ji = 0
+                if i != j:
+                    C_ji = max(minimal_distance-math.dist(data[i], data[j]), 0)
+
+                C_sum += C_ji
+            
+            sum_list.append(C_sum)
+            C_sum = 0
+
+        ## Select the maximizing points index
+        best_index = sum_list.index(max(sum_list))
+
+        ## Relocate new center
+        seed = np.append(seed, [data[best_index]], axis=0)
+        data = np.delete(data, obj=best_index, axis=0)
+
+    print("PRINTING Kaufman SEED: ", seed)    
+    return seed
+
+#print(kaufman(np.array([[1,2], [1.2,2.3], [3,4], [3.2,4.2], [1,2.2]]), K=2))
+
+
+
+
+def format_function():
+    ### Three # indicates the beginning of a major important step in a function
+
+    ## Two # indicates a substep under one major step. They are often superfluos.
+
+    # One # is used for comments and small notes. For example:
+    # Don't forget to add <functionality>
+    
+    pass

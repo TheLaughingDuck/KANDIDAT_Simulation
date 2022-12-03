@@ -40,6 +40,18 @@ print(seeds.plusplus_array(dframe, 5))
 #plt.show()'
 
 
+# What I wanted to figure out. And I did!
+#a=1
+#if a is None:
+#    print("Do X")
+#elif a < 0:
+#    print("Do X")
+
+#What I want
+#if a is None or a < 0:
+#    print("Do X")
+
+
 
 
 #pd.concat([b, c], keys=["x", "y"])
