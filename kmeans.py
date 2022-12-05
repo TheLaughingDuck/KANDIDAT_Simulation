@@ -6,7 +6,13 @@ import math
 '''Program file for running the k-means algorithm.'''
 
 
-def kmeans_func(data, seed_method, K, nstarts=1):
+def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True):
+    '''
+    Returns a list: [best_centers, loss_list]
+    best_centers is an array of the best centers.
+    loss_list is a list of length nstarts containing the SumSqrErr (SSE) for each start.
+    '''
+
     # list of loss values calculated for every start.
     loss_list = []
     
@@ -64,12 +70,13 @@ def kmeans_func(data, seed_method, K, nstarts=1):
     best_centers = finished_centers[loss_list.index(min(loss_list))]
 
     ### Possibly make a plot?
-    if len(data[0]) == 2 and nstarts == 1:
+    if len(data[0]) == 2 and nstarts == 1 and plot_yesno == True:
         make_plot(data, seed, best_centers)
     
-    return best_centers
+    return [best_centers, loss_list]
 
 import matplotlib.pyplot as plt
+
 
 def make_plot(data, seed, centers):
     #Plot data
@@ -85,4 +92,20 @@ def make_plot(data, seed, centers):
     plt.figtext(x=0.5, y=0.01, s="Text here", wrap=True)
 
     # Show plot
+    plt.show()
+
+
+
+def elbow_func(data, seed_method, min_k=1, max_k=10):
+    k_values = [i for i in range(min_k, max_k+1)]
+    Cost_list = []
+    for i in k_values:
+        # Run k-means and grab the loss_list (at pos 1), and take its mean.
+        kmeans_avg_loss = sum(kmeans_func(data, seed_method=seed_method, K=i, nstarts=10, plot_yesno=False)[1])/10
+        Cost_list.append(kmeans_avg_loss)
+    
+    # Plot Elbow graph
+    plt.scatter(k_values, Cost_list)
+
+    # Show
     plt.show()

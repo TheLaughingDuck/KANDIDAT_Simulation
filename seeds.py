@@ -3,6 +3,7 @@ import math
 import numpy as np
 
 def random_seed(df, K):
+    raise Exception("random_seed must be rewritten for NumPy!")
 
     seed_rows = random.sample([i for i in range(0, len(df))], K) #Produces a list of selected row indexes.
     seed = df.iloc[seed_rows] # Grab selected rows.
