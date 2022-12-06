@@ -2,19 +2,20 @@ import numpy as np
 import kmeans
 import random_data
 
-# All iris attributes are interesting
+# All iris attributes are interesting. K=3
 iris_data = np.loadtxt("Data/iris.txt", delimiter=",", usecols=(0,1,2,3))
-
 
 # Seeds (the last column indicates type. There are 3 types/clusters)
 seed_data = np.loadtxt("Data/seeds_dataset.txt", delimiter="\t", usecols=(0,1,2,3,4,5,6))
 
-# 10 groups?
+# 10 clusters?
 wine_red_data = np.loadtxt("Data/winequality-red.csv", delimiter=";", skiprows=1)
 wine_white_data = np.loadtxt("Data/winequality-white.csv", delimiter=";", skiprows=1)
+wine_data = np.append(wine_red_data, wine_white_data, axis=0)
 
 #print(seed_data[:5])
 
+#print(kmeans.kmeans_func(iris_data, seed_method="plusplus", K=3, nstarts=10, table_output=True))
 
 ### Elbow tests
 

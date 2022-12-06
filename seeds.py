@@ -2,11 +2,9 @@ import random
 import math
 import numpy as np
 
-def random_seed(df, K):
-    raise Exception("random_seed must be rewritten for NumPy!")
-
-    seed_rows = random.sample([i for i in range(0, len(df))], K) #Produces a list of selected row indexes.
-    seed = df.iloc[seed_rows] # Grab selected rows.
+def random_seed(data, K):
+    seed_rows = random.sample([i for i in range(0, len(data))], K) #Produces a list of selected row indexes.
+    seed = data[seed_rows] # Grab selected rows.
     
     return seed
 
@@ -93,6 +91,7 @@ def kaufman(data, K):
 
     ### Do some form of cycle until seed is appropriate length
     while len(seed) < K:
+        print("Running Kaufman. Seed_lengt = ", len(seed), " out of ", K)
         ## Calculate all different SUM C_{ji}
         C_sum = 0
         sum_list = []
@@ -122,7 +121,7 @@ def kaufman(data, K):
         seed = np.append(seed, [data[best_index]], axis=0)
         data = np.delete(data, obj=best_index, axis=0)
 
-    print("PRINTING Kaufman SEED: ", seed)    
+    #print("PRINTING Kaufman SEED: ", seed)    
     return seed
 
 #print(kaufman(np.array([[1,2], [1.2,2.3], [3,4], [3.2,4.2], [1,2.2]]), K=2))
