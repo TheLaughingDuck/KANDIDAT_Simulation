@@ -1,18 +1,22 @@
 import numpy as np
 
-#arr = np.array([[1,2,3],[4,5,6],[7,8,9],[10,11,12],[13,14,15],[16,17,18]])
-
-#with open("Data/" + "filename.txt", mode="w") as f:
-#    for line in arr:
-#        f.write(str(line) + "\n")
+import kmeans
 
 
-#np.savetxt("Data/" + "filename.txt", arr, delimiter=",")
+# All iris attributes are interesting. K=3. column 7 is categorical.
+#seed_data = np.loadtxt("Data/seeds_dataset.txt", delimiter="\t", usecols=(0,1,2,3,4,5,6,7))
 
-#print(np.loadtxt("Data/filename.txt", delimiter=","))
+#plus_seed_test = kmeans.kmeans_func(seed_data, seed_method="plusplus", K=3, nstarts=10, table_output=True, true_labels_included=True)
 
-def test_func(var1):
-    var1 = 5
-    print(var1)
+# All iris attributes are interesting. K=3
+#iris_data = np.loadtxt("Data/iris.txt", delimiter=",", usecols=(0,1,2,3,4))
 
-test_func(input(">>"))
+#plus_iris_test = kmeans.kmeans_func(iris_data, seed_method="plusplus", K=3, nstarts=10, table_output=True, true_labels_included=True)
+#print(plus_iris_test)
+
+
+test_data = np.loadtxt("Data/testmakeclusters.txt", delimiter=",")
+
+plus_test_test = kmeans.kmeans_func(test_data, seed_method="plusplus", K=4, nstarts=10, table_output=True, true_labels_included=True)
+
+print(plus_test_test)

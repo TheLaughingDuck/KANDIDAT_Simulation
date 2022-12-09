@@ -20,13 +20,24 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False):
     ### Generate TRUE centers
     true_centers = np.array([[random.random()*100 for i in range(d)] for i in range(K)])
 
+    ## Store center belonging
+    center_belonging = []
+
     one_point = random.choices(true_centers)[0]
+
+    # Store first points belonging
+    center_belonging.append(np.where(true_centers == one_point)[0][0])
+    
     randomness = [random.gauss(0, 1) for i in range(d)] #array of gaussians
     data = np.array([one_point + randomness])
 
     while len(data) < N:
         ### Select one center, add some randomness and "store" the point
         one_point = random.choices(true_centers)[0]
+
+        # Store center belonging
+        center_belonging.append(np.where(true_centers == one_point)[0][0])
+
         randomness = [random.gauss(0, 1) for i in range(d)] #array
         one_point = one_point + randomness
 
@@ -37,12 +48,16 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False):
         plt.scatter(data[:,0], data[:,1])
         plt.show()
     
+    # Append true assignment
+    data = np.append(data, [[i] for i in center_belonging], axis=1)
+
+
     if save_data == True:
         np.savetxt("Data/" + filename + ".txt", data, delimiter=",")
 
     return data
 
-#make_clusters(N=100, d=2, K=10, plot_yesno=True)
+#print(make_clusters(N=10, d=2, K=4, plot_yesno=True))
 
 #print("FINAL RESULT data: ", make_clusters_array(100, 2, 3))
 

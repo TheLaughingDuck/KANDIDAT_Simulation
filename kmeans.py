@@ -2,22 +2,36 @@ from sklearn.cluster import KMeans
 import seeds
 import math
 import matplotlib.pyplot as plt
+import numpy as np
+from statistics import mode
+
+from ttictoc import tic,toc
 
 '''Program file for running the k-means algorithm.'''
 
 
-def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=False):
+def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=False, true_labels_included = False):
     '''
     Returns a list: [best_centers, final_loss_list]
     best_centers is an array of the best centers.
     final_loss_list is a list of length nstarts containing the SumSqrErr (SSE) for each start.
     '''
 
+    data_with_labels = None
+    if true_labels_included == True:
+        data_with_labels = data
+        #true_labels = data[:,-1]
+        data = np.delete(data, obj=-1, axis=1) # Delete last row
+
+    # Timing
+    tic()
+
     # lists of loss at start, loss after k-means and required iterations.
-    # All have length nstarts
+    # All will have length nstarts
     start_loss_list = []
     final_loss_list = []
     requ_iterations = []
+    label_list = []
     
     
     # list of "finished" centres after every start.
@@ -49,6 +63,10 @@ def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=F
         kmeans_object = KMeans(n_clusters = K, init=seed, n_init=1, max_iter=100).fit(data)
         centers = kmeans_object.cluster_centers_
 
+        label_list.append(kmeans_object.labels_)
+        #Test
+        #print(kmeans_object.labels_)
+
         # Save number of iterations required
         requ_iterations.append(kmeans_object.n_iter_)
         
@@ -70,18 +88,51 @@ def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=F
     ### TABLE OUTPUT
     # Output *min SSE*, *% SSE decrease*, *avg required iterations*
     if table_output == True:
+        return format_output(start_loss_list, final_loss_list, requ_iterations, nstarts, data_with_labels, label_list, true_labels_included)
+
+    if table_output == True and False:
         min_loss = min(final_loss_list)
 
         SSE_decrease = 100 * (min_loss / start_loss_list[final_loss_list.index(min_loss)]) #Percentage
-
+        
         avg_iter = sum(requ_iterations)/nstarts
 
-        return [round(min_loss, 5), round(SSE_decrease, 2), avg_iter]
+        computation_time = toc()
+
+        accuracy = accuracy_func(data_with_labels, label_list[final_loss_list.index(min_loss)]) # Returns a percentage
+
+        OUTPUT = [min_loss, SSE_decrease, avg_iter, computation_time, accuracy]
+
+        return [round(i, 2) for i in OUTPUT]
     
     ### NORMAL OUTPUT
-    return [best_centers, final_loss_list]
+    return [best_centers, final_loss_list, toc()]
 
 
+
+def format_output(start_loss_list, final_loss_list, iterations, nstarts, data_with_labels, label_list, true_labels_included):
+    min_loss = min(final_loss_list)
+    
+    index = final_loss_list.index(min_loss)
+
+    SSE_decrease = 100 * (min_loss / start_loss_list[index]) #Percentage
+        
+    avg_iter = sum(iterations)/nstarts
+
+    computation_time = toc()
+
+    if true_labels_included == False:
+        accuracy = 0
+        print("Error: data_with_labels = None")
+    else:
+        accuracy = accuracy_func(data_with_labels, label_list[index]) # Returns a percentage
+
+    # Build output, fix rounding and throw on units
+    OUTPUT = [min_loss, SSE_decrease, avg_iter, computation_time, accuracy]
+    OUTPUT = [round(i, 2) for i in OUTPUT]
+    UNITS = ["", " %", " iterations", " sec", " %"]
+
+    return [str(OUTPUT[i]) + UNITS[i] for i in range(5)]
 
 
 def calculate_cost(data, seed):
@@ -108,9 +159,6 @@ def calculate_cost(data, seed):
 
     return COST
 
-    
-
-
 
 
 def make_plot(data, seed, centers):
@@ -131,7 +179,6 @@ def make_plot(data, seed, centers):
 
 
 
-
 def elbow_func(data, seed_method, min_k=1, max_k=10):
     k_values = [i for i in range(min_k, max_k+1)]
     Cost_list = []
@@ -145,3 +192,45 @@ def elbow_func(data, seed_method, min_k=1, max_k=10):
 
     # Show
     plt.show()
+
+
+
+def accuracy_func(arr, model_assignment):
+    '''
+    data: numpy array, with the last column containing *true* labels (coded by integers).
+
+    model_assignment: numpy array, with the *assigned* labels (coded by integers) from the kmeans algorithm.
+
+    Clearly it is assumed that model_assignment is based on the same ordering as in data.
+    '''
+    #print(arr)
+
+    # Get true labels
+    true_labels = np.unique(arr[:,-1], axis=0) # Array of unique elements in true label column (last column)
+
+    # Array copy we can manipulate (also attaching kmeans assignment as column on the right)
+    remaining_data = np.append(arr, [[i] for i in model_assignment], axis=1)
+
+    correctly_assigned = 0 # Count
+    for i in true_labels:
+        #print("Begin label: ", i)
+        one_cluster = remaining_data[remaining_data[:,-2] == i] # Creates array of all points in true cluster i
+        #print("this_cluster:\n", one_cluster)
+
+        # Find mode (in kmeans assignment)
+        the_mode = mode(one_cluster[:,-1]) # Grab mode of last column
+        #print("the mode: ", the_mode)
+
+        # Delete points belonging to the "assignment mode"
+        remaining_data = np.delete(remaining_data, obj=remaining_data[:,-1] == the_mode, axis=0)
+        #print("Remaining data:\n", remaining_data)
+
+        numb_popular_index = list(one_cluster[:,-1]).count(the_mode)
+
+        #print("Adding: ", numb_popular_index)
+        correctly_assigned += numb_popular_index
+        #print("---------------------")
+
+    #print("Correctly assigned: ", correctly_assigned/len(arr))
+    
+    return(round(100*correctly_assigned/len(arr), 2))

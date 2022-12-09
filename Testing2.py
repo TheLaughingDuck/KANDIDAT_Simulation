@@ -2,25 +2,89 @@ import numpy as np
 import kmeans
 import random_data
 
-# All iris attributes are interesting. K=3
-iris_data = np.loadtxt("Data/iris.txt", delimiter=",", usecols=(0,1,2,3))
 
-# Seeds (the last column indicates type. There are 3 types/clusters)
-seed_data = np.loadtxt("Data/seeds_dataset.txt", delimiter="\t", usecols=(0,1,2,3,4,5,6))
+from statistics import mode
 
-# 10 clusters?
-wine_red_data = np.loadtxt("Data/winequality-red.csv", delimiter=";", skiprows=1)
-wine_white_data = np.loadtxt("Data/winequality-white.csv", delimiter=";", skiprows=1)
-wine_data = np.append(wine_red_data, wine_white_data, axis=0)
+#arr[(arr==1)]
 
-#print(seed_data[:5])
 
-#print(kmeans.kmeans_func(iris_data, seed_method="plusplus", K=3, nstarts=10, table_output=True))
+# Column 1: Data, column 2: true label.
+arr=np.array([[1,1],[2,1],[3,2],[4,1],[5,1],[6,2],[7,1],[8,1],[9,1],[10,2],[11,2],[12,1],[13,1],[14,2],[15,2],[16,2],[17,2],[18,2], [19,1]])
+#                1     1     1     1     2     2     2     1     2      1      1      1      1      2      2      2      2      2       1
+kmeans_assignment = np.array([1, 1, 1, 1, 2, 2, 2, 1, 2, 1, 1, 1, 1, 2, 2, 2, 2, 2, 1])
 
-### Elbow tests
 
-#kmeans.elbow_func(seed_data, seed_method="plusplus", min_k=1, max_k=6)
 
-#data = random_data.make_clusters(1000, d=2, K=6)
+'''
+# Get true labels
+true_labels = np.unique(arr[:,-1], axis=0) # Array of unique elements in true label column (last column)
 
-#kmeans.elbow_func(data, seed_method="plusplus", min_k=1, max_k=10)
+# Array copy we can manipulate (also attaching kmeans assignment as column on the right)
+data = np.append(arr, [[i] for i in kmeans_assignment], axis=1)
+
+
+correctly_assigned = 0 # Count
+for i in true_labels:
+    print("Begin label: ", i)
+    one_cluster = data[data[:,-2] == i] # Creates array of all points in true cluster i
+    print("this_cluster:\n", one_cluster)
+
+    # Find mode (in kmeans assignment)
+    the_mode = mode(one_cluster[:,-1]) # Grab mode of last column
+    print("the mode: ", the_mode)
+
+    # Delete points belonging to the "assignment mode"
+    data = np.delete(data, obj=data[:,-1] == the_mode, axis=0)
+    print("Remaining data:\n", data)
+
+    numb_popular_index = list(one_cluster[:,-1]).count(the_mode)
+
+    print("Adding: ", numb_popular_index)
+    correctly_assigned += numb_popular_index
+    print("---------------------")
+
+print("Correctly assigned: ", correctly_assigned/len(arr))'''
+
+#from statistics import mode
+def accuracy_func(arr, model_assignment):
+    '''
+    data: numpy array, with the last column containing *true* labels (coded by integers).
+
+    model_assignment: numpy array, with the *assigned* labels (coded by integers) from the kmeans algorithm.
+
+    Clearly it is assumed that model_assignment is based on the same ordering as in data.
+    '''
+
+    # Get true labels
+    true_labels = np.unique(arr[:,-1], axis=0) # Array of unique elements in true label column (last column)
+
+    # Array copy we can manipulate (also attaching kmeans assignment as column on the right)
+    remaining_data = np.append(arr, [[i] for i in model_assignment], axis=1)
+
+    correctly_assigned = 0 # Count
+    for i in true_labels:
+        #print("Begin label: ", i)
+        one_cluster = remaining_data[remaining_data[:,-2] == i] # Creates array of all points in true cluster i
+        #print("this_cluster:\n", one_cluster)
+
+        # Find mode (in kmeans assignment)
+        the_mode = mode(one_cluster[:,-1]) # Grab mode of last column
+        #print("the mode: ", the_mode)
+
+        # Delete points belonging to the "assignment mode"
+        remaining_data = np.delete(remaining_data, obj=remaining_data[:,-1] == the_mode, axis=0)
+        #print("Remaining data:\n", remaining_data)
+
+        numb_popular_index = list(one_cluster[:,-1]).count(the_mode)
+
+        #print("Adding: ", numb_popular_index)
+        correctly_assigned += numb_popular_index
+        #print("---------------------")
+
+    #print("Correctly assigned: ", correctly_assigned/len(arr))
+    
+    return(round(correctly_assigned/len(arr), 2))
+
+
+
+accuracy_func(arr, kmeans_assignment)
