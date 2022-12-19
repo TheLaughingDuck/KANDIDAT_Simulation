@@ -9,7 +9,7 @@ import matplotlib.pyplot as plt
 
 
 
-def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False):
+def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False, length=100):
 
     if save_data == True:
         print("-----------------------")
@@ -18,7 +18,7 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False):
         filename = input(">>")
 
     ### Generate TRUE centers
-    true_centers = np.array([[random.random()*100 for i in range(d)] for i in range(K)])
+    true_centers = np.array([[random.random()*length for i in range(d)] for i in range(K)])
 
     ## Store center belonging
     center_belonging = []
@@ -66,3 +66,5 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False):
 # datasets, store them, and then read from the files. This function
 # is only intended to be used before the analysis part of the study takes
 # place.
+
+#make_clusters(N=500, d=5, K=7, save_data=True)

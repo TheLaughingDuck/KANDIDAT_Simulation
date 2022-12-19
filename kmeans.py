@@ -21,7 +21,7 @@ def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=F
     if true_labels_included == True:
         data_with_labels = data
         #true_labels = data[:,-1]
-        data = np.delete(data, obj=-1, axis=1) # Delete last row
+        data = np.delete(data, obj=-1, axis=1) # Delete last column
 
     # Timing
     tic()
@@ -89,21 +89,6 @@ def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=F
     # Output *min SSE*, *% SSE decrease*, *avg required iterations*
     if table_output == True:
         return format_output(start_loss_list, final_loss_list, requ_iterations, nstarts, data_with_labels, label_list, true_labels_included)
-
-    if table_output == True and False:
-        min_loss = min(final_loss_list)
-
-        SSE_decrease = 100 * (min_loss / start_loss_list[final_loss_list.index(min_loss)]) #Percentage
-        
-        avg_iter = sum(requ_iterations)/nstarts
-
-        computation_time = toc()
-
-        accuracy = accuracy_func(data_with_labels, label_list[final_loss_list.index(min_loss)]) # Returns a percentage
-
-        OUTPUT = [min_loss, SSE_decrease, avg_iter, computation_time, accuracy]
-
-        return [round(i, 2) for i in OUTPUT]
     
     ### NORMAL OUTPUT
     return [best_centers, final_loss_list, toc()]
@@ -203,7 +188,9 @@ def accuracy_func(arr, model_assignment):
 
     Clearly it is assumed that model_assignment is based on the same ordering as in data.
     '''
-    #print(arr)
+    #print("arr:\n", arr)
+
+    #print("model_assignment:\n", model_assignment)
 
     # Get true labels
     true_labels = np.unique(arr[:,-1], axis=0) # Array of unique elements in true label column (last column)
@@ -213,19 +200,35 @@ def accuracy_func(arr, model_assignment):
 
     correctly_assigned = 0 # Count
     for i in true_labels:
+        #print("i:\n", i)
         #print("Begin label: ", i)
         one_cluster = remaining_data[remaining_data[:,-2] == i] # Creates array of all points in true cluster i
         #print("this_cluster:\n", one_cluster)
 
         # Find mode (in kmeans assignment)
-        the_mode = mode(one_cluster[:,-1]) # Grab mode of last column
+        #print("one_cluster:\n", one_cluster)
+        if len(one_cluster) != 0:
+            the_mode = mode(one_cluster[:,-1]) # Grab mode of last column
+
+            # Delete points belonging to the "assignment mode"
+            remaining_data = np.delete(remaining_data, obj=remaining_data[:,-1] == the_mode, axis=0)
+            #print("Remaining data:\n", remaining_data)
+
+            numb_popular_index = list(one_cluster[:,-1]).count(the_mode)
+        else:
+            print("WARNING: I may have found an empty cluster with index i: ", i)
+            print("The reason for this might be that your ratio of k to N is too large.")
+            print("In other words, you have few enough clusters K for your N points, that it is possible this cluster was left empty when the dataset was created.")
+            #However, I seem to have reasonably disproven this. My new theory is that
+            # through this loop, points are assigned to varios clusters, and it just so happens that
+            # the true clusters that cause this issue (len(one_cluster) is equal to 0) have had
+            # all their points assigned to other kmeans-made clusters before they had a chance to
+            # "claim" their own clusters in this accuracy calculation. THATS MY THEORY ANYWAY.
+            # When bugtesting this, I used a dataset with N=1000, d=2, K=100
+            
+            numb_popular_index = 0
         #print("the mode: ", the_mode)
 
-        # Delete points belonging to the "assignment mode"
-        remaining_data = np.delete(remaining_data, obj=remaining_data[:,-1] == the_mode, axis=0)
-        #print("Remaining data:\n", remaining_data)
-
-        numb_popular_index = list(one_cluster[:,-1]).count(the_mode)
 
         #print("Adding: ", numb_popular_index)
         correctly_assigned += numb_popular_index
