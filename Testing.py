@@ -2,6 +2,8 @@ import numpy as np
 import random_data
 import kmeans
 import seeds
+import matplotlib.pyplot as plt
+import pandas as pd
 
 #seed_data = np.loadtxt("Data/seeds_dataset.txt", delimiter="\t", usecols=(0,1,2,3,4,5,6,7))
 
@@ -21,15 +23,19 @@ import seeds
 #print(plus_test_test)
 
 
+### MAKE CLUSTERS
+#random_data.make_clusters(N=1000, d=3, K=9, save_data=True, length = 1000)
 
-test1_data = np.loadtxt("Data/iris.txt", delimiter=",")
-test1 = kmeans.kmeans_func(test1_data, seed_method="random", K=3, nstarts=1, table_output=True, true_labels_included=True)
-print("Performing test iris: K=3, s=1")
-print(test1)
-print("-----------------------------")
 
-test2_data = np.loadtxt("Data/iris.txt", delimiter=",")
-test2 = kmeans.kmeans_func(test2_data, seed_method="random", K=3, nstarts=12, table_output=True, true_labels_included=True)
-print("Performing test iris (s): K=3, s=12")
-print(test2)
-print("-----------------------------")
+### PERFORM COMPARATIVE TESTS
+#print("Performing test: K=9, s=1, k-means++")
+#test1_data = np.loadtxt("Data/Comparative_study/datak9.txt", delimiter=",")
+#test1 = kmeans.kmeans_func(test1_data, seed_method="plusplus", K=9, nstarts=1, table_output=True, true_labels_included=True)
+#print(test1)
+#print("-----------------------------")
+
+
+
+seeds_data = np.loadtxt("Data/seeds_dataset.txt", delimiter="\t", usecols=(0,1,2,3,4,5,6,7))
+plt.scatter(seeds_data[:,0], seeds_data[:,6], c=pd.factorize(seeds_data[:,7])[0])
+plt.show()

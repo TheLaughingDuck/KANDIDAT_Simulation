@@ -4,6 +4,7 @@ import math
 import matplotlib.pyplot as plt
 import numpy as np
 from statistics import mode
+import pandas as pd
 
 from ttictoc import tic,toc
 
@@ -32,6 +33,7 @@ def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=F
     final_loss_list = []
     requ_iterations = []
     label_list = []
+    seed_list = []
     
     
     # list of "finished" centres after every start.
@@ -59,13 +61,13 @@ def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=F
         ## Calculate start loss
         start_loss_list.append(calculate_cost(data, seed))
 
+        seed_list.append(seed)
+
         ## RUN k-means Algorithm
         kmeans_object = KMeans(n_clusters = K, init=seed, n_init=1, max_iter=100).fit(data)
         centers = kmeans_object.cluster_centers_
 
         label_list.append(kmeans_object.labels_)
-        #Test
-        #print(kmeans_object.labels_)
 
         # Save number of iterations required
         requ_iterations.append(kmeans_object.n_iter_)
@@ -83,15 +85,20 @@ def kmeans_func(data, seed_method, K, nstarts=1, plot_yesno=True, table_output=F
     ### PRODUCE PLOT
     # Make scatterplot with data, seed and final centers if possible
     if len(data[0]) == 2 and plot_yesno == True:
-        make_plot(data, seed, best_centers)
+        make_plot(data, seed, best_centers, data_with_labels)
     
     ### TABLE OUTPUT
     # Output *min SSE*, *% SSE decrease*, *avg required iterations*
     if table_output == True:
+        print("K-means ouput:")
+        print("[accuracy (%), final_loss, seed_loss, CPU_time (s), avg_iter]")
         return format_output(start_loss_list, final_loss_list, requ_iterations, nstarts, data_with_labels, label_list, true_labels_included)
     
     ### NORMAL OUTPUT
-    return [best_centers, final_loss_list, toc()]
+    print("K-means output:")
+    print("[best_centers, corresponding seed, CPU time (sec)]")
+    resulting_seed = seed_list[final_loss_list.index(min(final_loss_list))]
+    return [best_centers, resulting_seed, toc()]
 
 
 
@@ -100,7 +107,7 @@ def format_output(start_loss_list, final_loss_list, iterations, nstarts, data_wi
     
     index = final_loss_list.index(min_loss)
 
-    SSE_decrease = 100 * (min_loss / start_loss_list[index]) #Percentage
+    seed_SSE = start_loss_list[index]
         
     avg_iter = sum(iterations)/nstarts
 
@@ -113,9 +120,10 @@ def format_output(start_loss_list, final_loss_list, iterations, nstarts, data_wi
         accuracy = accuracy_func(data_with_labels, label_list[index]) # Returns a percentage
 
     # Build output, fix rounding and throw on units
-    OUTPUT = [min_loss, SSE_decrease, avg_iter, computation_time, accuracy]
+    #OUTPUT = [min_loss, seed_SSE, avg_iter, computation_time, accuracy]
+    OUTPUT = [accuracy, min_loss, seed_SSE, computation_time, avg_iter]
     OUTPUT = [round(i, 2) for i in OUTPUT]
-    UNITS = ["", " %", " iterations", " sec", " %"]
+    UNITS = [" %", "", "", " sec", " iterations"]
 
     return [str(OUTPUT[i]) + UNITS[i] for i in range(5)]
 
@@ -146,9 +154,13 @@ def calculate_cost(data, seed):
 
 
 
-def make_plot(data, seed, centers):
+def make_plot(data, seed, centers, data_with_labels):
     #Plot data
-    plt.scatter(data[:,0], data[:,1], marker=".")
+    #print(type(data_with_labels))
+    if data_with_labels is not None:
+        plt.scatter(data[:,0], data[:,1], marker=".", c=pd.factorize(data_with_labels[:,2])[0])
+    else: #data_with_labels is None
+        plt.scatter(data[:,0], data[:,1], marker=".")
     
     #Plot seed
     plt.scatter(seed[:,0], seed[:,1], color="red", marker=".")
@@ -157,7 +169,7 @@ def make_plot(data, seed, centers):
     plt.scatter(centers[:,0], centers[:,1], color="orange", marker="*")
 
     #Label fix
-    plt.figtext(x=0.5, y=0.01, s="Text here", wrap=True)
+    #plt.figtext(x=0.5, y=0.01, s="Text here", wrap=True)
 
     # Show plot
     plt.show()

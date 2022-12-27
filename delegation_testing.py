@@ -97,7 +97,5 @@ def plusplus_estimation(K, d, length):
 #plusplus_estimation(K=5,d=2,length=10)
 
 
+#delegation_test(N=1000, d=3, K=10, l=1000)
 
-
-
-delegation_test(N=1000, d=20, K=4, l=500)
