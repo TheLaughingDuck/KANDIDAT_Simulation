@@ -1,11 +1,7 @@
-import random_data
 import kmeans
 import numpy as np
-from scipy.spatial import Voronoi, voronoi_plot_2d
 import matplotlib.pyplot as plt
 import pandas as pd
-
-from matplotlib.markers import MarkerStyle
 
 
 ### FIGURE 2
@@ -36,7 +32,7 @@ if False:
 
 
 ### Figure 9
-if True:
+if False:
     data = random_data.make_clusters(N=500, d=2, K=10, length=100)
     plt.scatter(data[:,0], data[:,1])
 
@@ -55,6 +51,23 @@ if True:
     plt.show()
 
 
+### FIGURE 10
+if True:
+    
+    K_values = [4,5,6,7,8,9]
+    time_data_unifr    = [ 1.90,  5.6,  16.44, 49.1, 136.18, 351.84]
+    time_data_plusplus = [ 0.12,  0.16,  0.16,  0.18,  0.21,   0.23]
+    time_data_kaufman  = [19.81, 31.48, 51.3,  62.59, 88.58,  98.01]
+
+    plt.plot(K_values, time_data_unifr, "g.", markersize=10, linestyle="dashed")
+    plt.plot(K_values, time_data_plusplus, "r.", markersize=10, linestyle="dashed")
+    plt.plot(K_values, time_data_kaufman, "b.", markersize=10, linestyle="dashed")
+
+    plt.xlabel("K")
+    plt.ylabel("Time (seconds)")
+
+    plt.legend(["R-Batched UnifRandom", "K-means++", "Kaufman"])
+    plt.show()
 
 
 
