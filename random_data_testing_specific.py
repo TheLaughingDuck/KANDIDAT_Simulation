@@ -9,7 +9,13 @@ import matplotlib.pyplot as plt
 
 
 
-def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False, length=100):
+def make_clusters(N, plot_yesno = False, save_data = False, length=20):
+    d=2
+    K=2
+
+    if N % 2 != 0:
+        N += 1
+
 
     if save_data == True:
         print("-----------------------")
@@ -18,6 +24,7 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False, length=100
         filename = input(">>")
 
     ### Generate TRUE centers
+    #true_centers = np.array([[25,250], [60, 95]]) # Potatoes and carrots
     true_centers = np.array([[random.random()*length for i in range(d)] for i in range(K)])
 
     ## Store center belonging
@@ -31,14 +38,26 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False, length=100
     randomness = [random.gauss(0, 1) for i in range(d)] #array of gaussians
     data = np.array([one_point + randomness])
 
+    # Create cluster 1
+    while len(data) < N/2:
+        ### Select first center
+        one_point = true_centers[0]
+        #print("one_point", one_point)
+
+        randomness = [random.gauss(0, 1) for i in range(d)] #array
+
+        one_point = one_point + randomness
+
+        data = np.append(data, [one_point], axis=0)
+
+    # Create cluster 2
     while len(data) < N:
-        ### Select one center, add some randomness and "store" the point
-        one_point = random.choices(true_centers)[0]
+        ### Select second center
+        one_point = true_centers[1]
 
         # Store center belonging
-        center_belonging.append(np.where(true_centers == one_point)[0][0])
+        #center_belonging.append(np.where(true_centers == one_point)[0][0])
 
-        
         randomness = [random.gauss(0, 1) for i in range(d)] #array
 
         one_point = one_point + randomness
@@ -51,7 +70,7 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False, length=100
         plt.show()
     
     # Append true assignment
-    data = np.append(data, [[i] for i in center_belonging], axis=1)
+    #data = np.append(data, [[i] for i in center_belonging], axis=1)
 
 
     if save_data == True:
@@ -59,7 +78,7 @@ def make_clusters(N, d=2, K=4, plot_yesno = False, save_data = False, length=100
 
     return data
 
-#print(make_clusters(N=10, d=2, K=4, plot_yesno=True))
+#print(make_clusters(N=10))
 
 #print("FINAL RESULT data: ", make_clusters_array(100, 2, 3))
 

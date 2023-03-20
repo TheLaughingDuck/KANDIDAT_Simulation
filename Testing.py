@@ -35,7 +35,21 @@ import pandas as pd
 #print("-----------------------------")
 
 
+#seeds_data = np.loadtxt("Data/seeds_dataset.txt", delimiter="\t", usecols=(0,1,2,3,4,5,6,7))
+#plt.scatter(seeds_data[:,0], seeds_data[:,6], c=pd.factorize(seeds_data[:,7])[0])
+#plt.show()
 
-seeds_data = np.loadtxt("Data/seeds_dataset.txt", delimiter="\t", usecols=(0,1,2,3,4,5,6,7))
-plt.scatter(seeds_data[:,0], seeds_data[:,6], c=pd.factorize(seeds_data[:,7])[0])
-plt.show()
+### TABLE 3
+#random_data.make_clusters(N=1000, d=3, K=9, save_data=True, length = 1000)
+#print("9")
+
+
+
+print("Performing test: K=5, s=77, UnifRandom")
+test1_data = np.loadtxt("Data/Unif_vs_batched_data/uni_vs_batched_k5.txt", delimiter=",")
+#test1_data = np.loadtxt("Data/UCI_data/seeds_dataset.txt", delimiter="\t")
+#test1_data = np.loadtxt("Data/UCI_data/iris.txt", delimiter=",")
+
+test1 = kmeans.kmeans_func(test1_data, seed_method="random", K=5, nstarts=77, table_output=True, true_labels_included=True)
+print(test1)
+print("-----------------------------")
